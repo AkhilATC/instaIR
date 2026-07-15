@@ -1,0 +1,94 @@
+?start: program
+
+program: entity
+
+entity: ENTITY NAME block
+
+block: "{" statement* "}"
+
+?statement: let_stmt
+          | move_stmt
+          | pop_stmt
+          | foreach_stmt
+          | convert_stmt
+
+//-----------------------------------------------------
+// LET
+//-----------------------------------------------------
+
+let_stmt: LET NAME "=" expr
+
+//-----------------------------------------------------
+// MOVE
+//-----------------------------------------------------
+
+move_stmt: MOVE path "->" path
+
+//-----------------------------------------------------
+// POP
+//-----------------------------------------------------
+
+pop_stmt: POP path
+
+//-----------------------------------------------------
+// FOREACH
+//-----------------------------------------------------
+
+foreach_stmt: FOREACH path AS NAME block
+
+//-----------------------------------------------------
+// CONVERT
+//-----------------------------------------------------
+
+convert_stmt: CONVERT NAME "(" expr ")"
+
+//-----------------------------------------------------
+// EXPRESSIONS
+//-----------------------------------------------------
+
+?expr: NEW                 -> new_object
+     | path
+     | STRING              -> string
+     | NUMBER              -> number
+     | TRUE                -> true
+     | FALSE               -> false
+
+//-----------------------------------------------------
+// VARIABLES
+//-----------------------------------------------------
+
+
+//-----------------------------------------------------
+// PATH
+//-----------------------------------------------------
+
+path: root path_part*
+
+root: "$"? NAME
+
+path_part: "." NAME               -> field
+         | "." NAME "[" NUMBER "]" -> index
+         | "." NAME "[*]"          -> wildcard
+
+//-----------------------------------------------------
+
+ENTITY: "ENTITY"
+LET: "LET"
+MOVE: "MOVE"
+POP: "POP"
+FOREACH: "FOREACH"
+AS: "AS"
+CONVERT: "CONVERT"
+
+NEW: "NEW"
+
+TRUE: "TRUE"
+FALSE: "FALSE"
+
+NAME: /[A-Za-z_][A-Za-z0-9_]*/
+
+%import common.NUMBER
+%import common.ESCAPED_STRING -> STRING
+%import common.WS
+
+%ignore WS
